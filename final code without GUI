@@ -1,0 +1,39 @@
+import requests
+from bs4 import BeautifulSoup
+from time import sleep
+from twilio.rest import Client
+from tkinter import *
+
+client = Client("twilio id", "your token")
+url = "https://www.amazon.fr/Processeur-AMD-RYZEN9-Socket-100-100000023Box/dp/B07SXMZLP9/ref=sr_1_15?__mk_fr_FR=%C3" \
+      "%85M%C3%85%C5%BD%C3%95%C3%91&crid=7DMEJPBZPQ1W&dchild=1&keywords=amd+ryzen+5+3600x&qid=1599318836&sprefix=amd" \
+      "+ryzen+%2Caps%2C510&sr=8-15" \
+      "+ryzen+%2Caps%2C510&sr=8-15 "
+Headers = {
+    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36"}
+
+
+def start():
+    reponse = requests.get(url, headers=Headers)
+
+    soup = BeautifulSoup(reponse.content, "lxml")
+
+    actual_price = float(
+        soup.find(id="priceblock_ourprice").get_text().replace('.', '').replace('€', '').replace(',', '.').strip())
+
+    price_wanted = 900
+
+    for do in range(1000):
+        sleep(5)
+        if actual_price <= price_wanted:
+            print("nice price")
+            print("prix original", price_wanted)
+            client.messages.create(to="your number", from_="twillio number",
+                                   body="good price buy now!! !")
+            break
+        else:
+            print("bad price")
+
+
+
+start()
